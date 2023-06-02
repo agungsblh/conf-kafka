@@ -1,0 +1,49 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath "gradle.plugin.com.github.jengelman.gradle.plugins:shadow:7.0.0"
+    }
+}
+plugins {
+    id 'java'
+    id "idea"
+    id "eclipse"
+}
+
+group 'org.example'
+sourceCompatibility = "1.11"
+targetCompatibility = "1.11"
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+    maven {
+        url "https://packages.confluent.io/maven"
+    }
+}
+apply plugin: "com.github.johnrengelman.shadow"
+dependencies {
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+    implementation group: 'org.slf4j', name: 'slf4j-nop', version: '1.7.36'
+    implementation group: 'org.apache.kafka', name: 'kafka-clients', version: '3.3.1'
+}
+
+test {
+    useJUnitPlatform()
+}
+jar {
+    manifest {
+        attributes(
+                "Class-Path": configurations.compileClasspath.collect { it.getName() }.join(" "),
+                "Main-Class": "examples.ProducerExample"
+        )
+    }
+}
+
+shadowJar {
+    archiveBaseName = "kafka-java-getting-started"
+    archiveClassifier = ''
+}
